@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ShopSphere.API/ShopSphere.API.csproj" />
+  <Project Path="ShopSphere.Application/ShopSphere.Application.csproj" />
+  <Project Path="ShopSphere.Domain/ShopSphere.Domain.csproj" />
+  <Project Path="ShopSphere.Infrastructure/ShopSphere.Infrastructure.csproj" />
+</Solution>
