@@ -1,0 +1,86 @@
+<div class="page-container">
+
+  @if (isLoading()) {
+    <p class="status-text">Loading order...</p>
+  }
+
+  @if (!isLoading() && !order()) {
+    <p class="status-text">Order not found.</p>
+  }
+
+  @if (!isLoading() && order(); as o) {
+
+    @if (justPlaced()) {
+      <div class="success-banner">✓ Your order was placed successfully!</div>
+    }
+
+    <div class="order-header">
+      <div>
+        <h1>Order #{{ o.id }}</h1>
+        <p class="order-date">Placed on {{ o.orderDate | date: 'medium' }}</p>
+      </div>
+      <span class="status-badge" [class]="statusClass(o.status)">{{ o.status }}</span>
+      @if (o.status === 'Pending') {
+        <button (click)="cancelOrder()" [disabled]="isCancelling()" class="cancel-btn">
+          {{ isCancelling() ? 'Cancelling...' : 'Cancel Order' }}
+        </button>
+      }
+      @if (cancelError()) {
+        <p class="field-error">{{ cancelError() }}</p>
+      }
+    </div>
+
+    <div class="details-layout">
+
+      <div class="items-section">
+        <h2>Items</h2>
+        @for (item of o.items; track item.productId) {
+          <div class="order-item">
+            <img
+              [src]="item.imageUrl ? imageBaseUrl + item.imageUrl : 'https://placehold.co/70x70?text=No+Image'"
+              [alt]="item.productName"
+              (error)="$any($event.target).src = 'https://placehold.co/70x70?text=No+Image'"
+            />
+            <div class="item-info">
+              <p class="item-name">{{ item.productName }}</p>
+              <p class="item-qty">Qty: {{ item.quantity }} × ${{ item.unitPrice.toFixed(2) }}</p>
+            </div>
+            <div class="item-subtotal">${{ item.subtotal.toFixed(2) }}</div>
+          </div>
+        }
+      </div>
+
+      <div class="side-section">
+        <div class="summary-box">
+          <h2>Order Summary</h2>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>${{ (o.totalAmount + o.discountAmount).toFixed(2) }}</span>
+          </div>
+          @if (o.couponCode) {
+            <div class="summary-row discount">
+              <span>Discount ({{ o.couponCode }})</span>
+              <span>-${{ o.discountAmount.toFixed(2) }}</span>
+            </div>
+          }
+          <div class="summary-row total">
+            <span>Total</span>
+            <span>${{ o.totalAmount.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="shipping-box">
+          <h2>Shipping Address</h2>
+          <p>{{ o.shippingFullName }}</p>
+          <p>{{ o.shippingStreet }}</p>
+          <p>{{ o.shippingCity }}, {{ o.shippingState }} {{ o.shippingPostalCode }}</p>
+          <p>{{ o.shippingCountry }}</p>
+          <p>{{ o.shippingPhone }}</p>
+        </div>
+      </div>
+
+    </div>
+
+    <a routerLink="/orders" class="back-link">← Back to My Orders</a>
+  }
+</div>

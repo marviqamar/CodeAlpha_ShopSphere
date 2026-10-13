@@ -1,0 +1,144 @@
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.filter-bar input,
+.filter-bar select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.price-input {
+  width: 110px;
+}
+
+.status-text {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+}
+
+.result-count {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: #f3f3f3;
+}
+
+.product-info {
+  padding: 14px;
+}
+
+.product-info h3 {
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+
+.category-tag {
+  font-size: 12px;
+  color: #888;
+  margin: 0 0 8px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 6px;
+}
+
+.rating {
+  font-size: 13px;
+  color: #555;
+  margin: 0 0 6px;
+}
+
+.rating.no-reviews {
+  color: #999;
+}
+
+.stock {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.stock.in { color: #16a34a; }
+.stock.low { color: #ea580c; }
+.stock.out { color: #dc2626; }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.pagination button {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pagination button.active {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

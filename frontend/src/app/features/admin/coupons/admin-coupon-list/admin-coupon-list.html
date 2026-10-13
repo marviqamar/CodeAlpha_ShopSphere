@@ -1,0 +1,101 @@
+<div class="admin-page">
+  <div class="admin-page-header">
+    <h1>Manage Coupons</h1>
+    <button (click)="openCreateForm()" class="primary-btn">+ Add Coupon</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="form-card">
+      <h2>Create Coupon</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Code</label>
+          <input [(ngModel)]="formData.code" placeholder="e.g. SAVE20" />
+        </div>
+
+        <div class="form-group">
+          <label>Discount Type</label>
+          <select [(ngModel)]="formData.discountType">
+            <option value="Percentage">Percentage (%)</option>
+            <option value="FixedAmount">Fixed Amount ($)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Discount Value</label>
+          <input type="number" [(ngModel)]="formData.discountValue" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label>Minimum Order Amount</label>
+          <input type="number" [(ngModel)]="formData.minOrderAmount" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label>Max Uses (leave blank for unlimited)</label>
+          <input type="number" [(ngModel)]="formData.maxUses" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label>Expiry Date (leave blank for no expiry)</label>
+          <input type="date" [(ngModel)]="formData.expiryDate" />
+        </div>
+      </div>
+
+      @if (formError()) {
+        <p class="form-error">{{ formError() }}</p>
+      }
+
+      <div class="form-actions">
+        <button (click)="saveCoupon()" class="primary-btn">Create</button>
+        <button (click)="cancelForm()" class="secondary-btn">Cancel</button>
+      </div>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <p class="status-text">Loading coupons...</p>
+  }
+
+  @if (!isLoading()) {
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Discount</th>
+          <th>Min Order</th>
+          <th>Usage</th>
+          <th>Expiry</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (coupon of coupons(); track coupon.id) {
+          <tr>
+            <td><strong>{{ coupon.code }}</strong></td>
+            <td>
+              {{ coupon.discountType === 'Percentage' ? coupon.discountValue + '%' : '$' + coupon.discountValue.toFixed(2) }}
+            </td>
+            <td>${{ coupon.minOrderAmount.toFixed(2) }}</td>
+            <td>{{ coupon.usedCount }} / {{ coupon.maxUses ?? '∞' }}</td>
+            <td>{{ coupon.expiryDate ? (coupon.expiryDate | date: 'mediumDate') : 'Never' }}</td>
+            <td>
+              @if (isExpired(coupon)) {
+                <span class="status-pill expired">Expired</span>
+              } @else if (!coupon.isActive) {
+                <span class="status-pill inactive">Inactive</span>
+              } @else {
+                <span class="status-pill active">Active</span>
+              }
+            </td>
+            <td>
+              <button (click)="deleteCoupon(coupon.id)" class="link-btn danger">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

@@ -1,0 +1,35 @@
+<div class="page-container">
+  <h1>My Orders</h1>
+
+  @if (isLoading()) {
+    <p class="status-text">Loading orders...</p>
+  }
+
+  @if (!isLoading() && orders().length === 0) {
+    <div class="empty-state">
+      <p>You haven't placed any orders yet.</p>
+      <a routerLink="/">Start Shopping</a>
+    </div>
+  }
+
+  @if (!isLoading() && orders().length > 0) {
+    <div class="order-list">
+      @for (order of orders(); track order.id) {
+        <a [routerLink]="['/orders', order.id]" class="order-card">
+          <div class="order-card-header">
+            <div>
+              <strong>Order #{{ order.id }}</strong>
+              <span class="order-date">{{ order.orderDate | date: 'mediumDate' }}</span>
+            </div>
+            <span class="status-badge" [class]="statusClass(order.status)">{{ order.status }}</span>
+          </div>
+
+          <div class="order-card-body">
+            <span>{{ order.items.length }} item(s)</span>
+            <span class="order-total">${{ order.totalAmount.toFixed(2) }}</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

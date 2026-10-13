@@ -1,0 +1,135 @@
+<div class="page-container">
+  <h1>Checkout</h1>
+
+  @if (isLoading()) {
+    <p class="status-text">Loading checkout...</p>
+  }
+
+  @if (!isLoading() && cart(); as c) {
+    <div class="checkout-layout">
+
+      <!-- Shipping form -->
+      <div class="shipping-section">
+        <h2>Shipping Address</h2>
+
+        <form [formGroup]="shippingForm">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input formControlName="shippingFullName" />
+            @if (shippingForm.get('shippingFullName')?.invalid && shippingForm.get('shippingFullName')?.touched) {
+              <span class="field-error">Required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Phone</label>
+            <input formControlName="shippingPhone" />
+            @if (shippingForm.get('shippingPhone')?.invalid && shippingForm.get('shippingPhone')?.touched) {
+              <span class="field-error">Required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Street Address</label>
+            <input formControlName="shippingStreet" />
+            @if (shippingForm.get('shippingStreet')?.invalid && shippingForm.get('shippingStreet')?.touched) {
+              <span class="field-error">Required.</span>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>City</label>
+              <input formControlName="shippingCity" />
+            </div>
+            <div class="form-group">
+              <label>State</label>
+              <input formControlName="shippingState" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Postal Code</label>
+              <input formControlName="shippingPostalCode" />
+            </div>
+            <div class="form-group">
+              <label>Country</label>
+              <input formControlName="shippingCountry" />
+            </div>
+          </div>
+        </form>
+
+        <!-- Coupon -->
+        <div class="coupon-section">
+          <h3>Coupon Code</h3>
+
+          @if (!appliedCoupon()) {
+            <div class="coupon-input-row">
+              <input
+                [(ngModel)]="couponCode"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="Enter coupon code"
+              />
+              <button (click)="applyCoupon()" [disabled]="isValidatingCoupon() || !couponCode.trim()">
+                {{ isValidatingCoupon() ? 'Checking...' : 'Apply' }}
+              </button>
+            </div>
+            @if (couponError()) {
+              <p class="field-error">{{ couponError() }}</p>
+            }
+          }
+
+          @if (appliedCoupon(); as coupon) {
+            <div class="applied-coupon">
+              <span>✓ "{{ coupon.code }}" applied — saved ${{ coupon.discountAmount.toFixed(2) }}</span>
+              <button (click)="removeCoupon()" class="remove-coupon-btn">Remove</button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Order summary -->
+      <div class="order-summary">
+        <h2>Order Summary</h2>
+
+        @for (item of c.items; track item.productId) {
+          <div class="summary-item">
+            <span>{{ item.productName }} × {{ item.quantity }}</span>
+            <span>${{ item.subtotal.toFixed(2) }}</span>
+          </div>
+        }
+
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>${{ c.totalAmount.toFixed(2) }}</span>
+        </div>
+
+        @if (appliedCoupon(); as coupon) {
+          <div class="summary-row discount">
+            <span>Discount ({{ coupon.code }})</span>
+            <span>-${{ coupon.discountAmount.toFixed(2) }}</span>
+          </div>
+        }
+
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>${{ finalTotal.toFixed(2) }}</span>
+        </div>
+
+        @if (orderError()) {
+          <p class="field-error">{{ orderError() }}</p>
+        }
+
+        <button
+          class="place-order-btn"
+          (click)="placeOrder()"
+          [disabled]="isPlacingOrder()"
+        >
+          {{ isPlacingOrder() ? 'Placing Order...' : 'Place Order' }}
+        </button>
+      </div>
+
+    </div>
+  }
+</div>

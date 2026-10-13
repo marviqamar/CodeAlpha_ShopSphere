@@ -1,0 +1,112 @@
+<div class="page-container">
+
+  <h1>Our Products</h1>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <input
+      type="text"
+      placeholder="Search products..."
+      [(ngModel)]="search"
+      (ngModelChange)="onFilterChange()"
+      class="search-input"
+    />
+
+    <select [(ngModel)]="selectedCategoryId" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="null">All Categories</option>
+      @for (category of categories(); track category.id) {
+        <option [ngValue]="category.id">{{ category.name }}</option>
+      }
+    </select>
+
+    <input
+      type="number"
+      placeholder="Min price"
+      [(ngModel)]="minPrice"
+      (ngModelChange)="onFilterChange()"
+      class="price-input"
+    />
+
+    <input
+      type="number"
+      placeholder="Max price"
+      [(ngModel)]="maxPrice"
+      (ngModelChange)="onFilterChange()"
+      class="price-input"
+    />
+
+    <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
+      <option value="CreatedAt">Newest</option>
+      <option value="Price">Price</option>
+      <option value="Name">Name</option>
+    </select>
+
+    <select [(ngModel)]="sortDescending" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="true">Descending</option>
+      <option [ngValue]="false">Ascending</option>
+    </select>
+  </div>
+
+  <!-- Loading state -->
+  @if (isLoading()) {
+    <p class="status-text">Loading products...</p>
+  }
+
+  <!-- Empty state -->
+  @if (!isLoading() && products().length === 0) {
+    <p class="status-text">No products found. Try adjusting your filters.</p>
+  }
+
+  <!-- Product grid -->
+  @if (!isLoading() && products().length > 0) {
+    <p class="result-count">{{ totalCount() }} products found</p>
+
+    <div class="product-grid">
+      @for (product of products(); track product.id) {
+        <a [routerLink]="['/products', product.id]" class="product-card">
+          <img
+            [src]="product.imageUrls[0] ? imageBaseUrl + product.imageUrls[0] : 'https://placehold.co/250x250?text=No+Image'"
+            [alt]="product.name"
+            (error)="onImageError($event)"
+          />
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="category-tag">{{ product.categoryName }}</p>
+            <p class="price">${{ product.price.toFixed(2) }}</p>
+
+            @if (product.reviewCount > 0) {
+              <p class="rating">⭐ {{ product.averageRating }} ({{ product.reviewCount }})</p>
+            } @else {
+              <p class="rating no-reviews">No reviews yet</p>
+            }
+
+            @if (product.stockQuantity === 0) {
+              <p class="stock out">Out of stock</p>
+            } @else if (product.stockQuantity <= 5) {
+              <p class="stock low">Only {{ product.stockQuantity }} left</p>
+            } @else {
+              <p class="stock in">In stock</p>
+            }
+          </div>
+        </a>
+      }
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button (click)="goToPage(pageNumber - 1)" [disabled]="pageNumber === 1">Previous</button>
+
+      @for (page of pagesArray(); track page) {
+        <button
+          (click)="goToPage(page)"
+          [class.active]="page === pageNumber"
+        >
+          {{ page }}
+        </button>
+      }
+
+      <button (click)="goToPage(pageNumber + 1)" [disabled]="pageNumber === totalPages()">Next</button>
+    </div>
+  }
+
+</div>

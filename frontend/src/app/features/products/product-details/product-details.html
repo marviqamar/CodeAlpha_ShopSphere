@@ -1,0 +1,137 @@
+@if (isLoading()) {
+  <p class="status-text">Loading product...</p>
+}
+
+@if (!isLoading() && !product()) {
+  <p class="status-text">Product not found.</p>
+}
+
+@if (!isLoading() && product(); as p) {
+  <div class="details-container">
+
+    <!-- Image gallery -->
+    <div class="gallery">
+      <img
+        class="main-image"
+        [src]="p.imageUrls[selectedImageIndex()] ? imageBaseUrl + p.imageUrls[selectedImageIndex()] : 'https://placehold.co/500x500?text=No+Image'"
+        [alt]="p.name"
+        (error)="$any($event.target).src = 'https://placehold.co/500x500?text=No+Image'"
+      />
+
+      @if (p.imageUrls.length > 1) {
+        <div class="thumbnails">
+          @for (url of p.imageUrls; track $index) {
+            <img
+              [src]="imageBaseUrl + url"
+              [class.active]="$index === selectedImageIndex()"
+              (click)="selectImage($index)"
+              (error)="$any($event.target).src = 'https://placehold.co/80x80?text=NA'"
+            />
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Info -->
+    <div class="info">
+      <p class="category-tag">{{ p.categoryName }}</p>
+      <h1>{{ p.name }}</h1>
+
+      @if (p.reviewCount > 0) {
+        <p class="rating">⭐ {{ p.averageRating }} ({{ p.reviewCount }} reviews)</p>
+      } @else {
+        <p class="rating no-reviews">No reviews yet</p>
+      }
+
+      <p class="price">${{ p.price.toFixed(2) }}</p>
+
+      <p class="description">{{ p.description }}</p>
+
+      @if (p.stockQuantity === 0) {
+        <p class="stock out">Out of stock</p>
+      } @else if (p.stockQuantity <= 5) {
+        <p class="stock low">Only {{ p.stockQuantity }} left in stock</p>
+      } @else {
+        <p class="stock in">In stock</p>
+      }
+
+      @if (authService.isLoggedIn() && p.stockQuantity > 0) {
+        <div class="add-to-cart-row">
+          <input type="number" [(ngModel)]="quantity" min="1" [max]="p.stockQuantity" class="qty-input" />
+          <button (click)="addToCart()" class="add-cart-btn">Add to Cart</button>
+        </div>
+      }
+
+      @if (authService.isLoggedIn()) {
+        <button (click)="toggleWishlist()" class="wishlist-btn">
+          {{ wishlistService.isInWishlist(p.id) ? '♥ In Wishlist' : '♡ Add to Wishlist' }}
+        </button>
+}
+
+      @if (!authService.isLoggedIn()) {
+        <p class="login-prompt">
+          <a routerLink="/login">Login</a> to add this to your cart.
+        </p>
+      }
+
+      @if (addToCartMessage()) {
+        <p class="add-cart-message">{{ addToCartMessage() }}</p>
+      }
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="reviews-section">
+    <h2>Reviews ({{ reviews().length }})</h2>
+
+    @if (authService.isLoggedIn()) {
+      <div class="write-review">
+        <h3>Write a Review</h3>
+
+        <label>Rating</label>
+        <div class="star-picker" (mouseleave)="clearHoverRating()">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <span
+              class="star"
+              [class.filled]="star <= (hoverRating() || newReviewRating)"
+              (mouseenter)="setHoverRating(star)"
+              (click)="setRating(star)"
+            >★</span>
+          }
+        </div>
+
+        <textarea
+          [(ngModel)]="newReviewComment"
+          placeholder="Share your thoughts about this product (optional)"
+          rows="3"
+        ></textarea>
+
+        <button (click)="submitReview()">Submit Review</button>
+
+        @if (reviewError()) {
+          <p class="review-error">{{ reviewError() }}</p>
+        }
+        @if (reviewSuccess()) {
+          <p class="review-success">{{ reviewSuccess() }}</p>
+        }
+      </div>
+    }
+
+    @if (reviews().length === 0) {
+      <p class="status-text">No reviews yet. Be the first to review this product!</p>
+    }
+
+    @for (review of reviews(); track review.id) {
+      <div class="review-card">
+        <div class="review-header">
+          <strong>{{ review.userName }}</strong>
+          <span class="review-stars">{{ '⭐'.repeat(review.rating) }}</span>
+        </div>
+        @if (review.comment) {
+          <p class="review-comment">{{ review.comment }}</p>
+        }
+        <p class="review-date">{{ review.createdAt | date: 'mediumDate' }}</p>
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,57 @@
+<div class="admin-page">
+  <h1>Manage Orders</h1>
+
+  @if (isLoading()) {
+    <p class="status-text">Loading orders...</p>
+  }
+
+  @if (!isLoading()) {
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Update Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of orders(); track order.id) {
+          <tr>
+            <td>#{{ order.id }}</td>
+            <td>
+              <div>{{ order.customerName }}</div>
+              <div class="customer-email">{{ order.customerEmail }}</div>
+            </td>
+            <td>{{ order.orderDate | date: 'mediumDate' }}</td>
+            <td>{{ order.items.length }}</td>
+            <td>${{ order.totalAmount.toFixed(2) }}</td>
+            <td>
+              <span class="status-pill" [class]="statusClass(order.status)">{{ order.status }}</span>
+            </td>
+            <td>
+              <select
+                [ngModel]="order.status"
+                (ngModelChange)="updateStatus(order, $event)"
+                [disabled]="updatingOrderId() === order.id"
+              >
+                @for (status of statusOptions; track status) {
+                  <option [value]="status">{{ status }}</option>
+                }
+              </select>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button (click)="goToPage(pageNumber - 1)" [disabled]="pageNumber === 1">Previous</button>
+      <span>Page {{ pageNumber }} of {{ totalPages() }}</span>
+      <button (click)="goToPage(pageNumber + 1)" [disabled]="pageNumber === totalPages()">Next</button>
+    </div>
+  }
+</div>
