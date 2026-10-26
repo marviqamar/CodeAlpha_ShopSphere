@@ -49,7 +49,7 @@
                 ${{ item.subtotal.toFixed(2) }}
               </div>
 
-              <button class="remove-btn" (click)="removeItem(item.id)">Remove</button>
+              <button class="remove-btn" (click)="removeItem(item.id, item.productName)">Remove</button>
             </div>
           }
         </div>
@@ -73,3 +73,4 @@
     }
   }
 </div>
+<app-confirm-dialog></app-confirm-dialog>

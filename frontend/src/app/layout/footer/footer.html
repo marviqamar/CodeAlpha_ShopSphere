@@ -1,0 +1,32 @@
+<footer class="site-footer">
+  <div class="footer-inner container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <span class="brand-mark">
+          <img src="images/icon.png" alt="" />
+        </span>
+        <span class="brand-text">ShopSphere</span>
+      </div>
+      <p class="footer-desc">A straightforward online store for browsing, buying, and tracking your orders — all in one place.</p>
+    </div>
+
+    <div class="footer-links">
+      <h4>Shop</h4>
+      <a routerLink="/">All Products</a>
+      @if (authService.isLoggedIn()) {
+        <a routerLink="/wishlist">Wishlist</a>
+        <a routerLink="/cart">Cart</a>
+        <a routerLink="/orders">My Orders</a>
+      }
+    </div>
+
+    <div class="footer-support">
+      <h4>Support</h4>
+      <p>Need help with an order? Check your <a routerLink="/orders">Order History</a>, or sign in to reach support through your account.</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom container">
+    <p>© {{ year }} ShopSphere. All rights reserved.</p>
+  </div>
+</footer>

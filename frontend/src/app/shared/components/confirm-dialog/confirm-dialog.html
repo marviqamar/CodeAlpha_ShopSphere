@@ -1,0 +1,12 @@
+@if (isOpen()) {
+  <div class="dialog-overlay" (click)="close()">
+    <div class="dialog-box" (click)="$event.stopPropagation()">
+      <h3>{{ title() }}</h3>
+      <p>{{ message() }}</p>
+      <div class="dialog-actions">
+        <button class="btn-secondary" (click)="close()">Cancel</button>
+        <button class="btn-danger" (click)="confirm()">{{ confirmLabel() }}</button>
+      </div>
+    </div>
+  </div>
+}

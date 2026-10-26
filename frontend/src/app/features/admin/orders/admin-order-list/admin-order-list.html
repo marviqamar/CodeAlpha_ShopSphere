@@ -1,52 +1,96 @@
 <div class="admin-page">
-  <h1>Manage Orders</h1>
+  <div class="page-header">
+    <div>
+      <p class="page-description">
+        View and manage customer orders
+        @if (!isLoading()) {
+          <span class="count-badge">{{ orders().length }} shown</span>
+        }
+      </p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.3-4.3"/>
+      </svg>
+      <input
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilters()"
+        placeholder="Search by order # or customer..."
+      />
+    </div>
+
+    <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" class="status-filter">
+      <option value="">All Statuses</option>
+      @for (status of statusOptions; track status) {
+        <option [value]="status">{{ status }}</option>
+      }
+    </select>
+  </div>
 
   @if (isLoading()) {
     <p class="status-text">Loading orders...</p>
   }
 
-  @if (!isLoading()) {
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Order #</th>
-          <th>Customer</th>
-          <th>Date</th>
-          <th>Items</th>
-          <th>Total</th>
-          <th>Status</th>
-          <th>Update Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (order of orders(); track order.id) {
+  @if (!isLoading() && orders().length === 0) {
+    <div class="empty-state">
+      <p>No orders match your filters.</p>
+    </div>
+  }
+
+  @if (!isLoading() && orders().length > 0) {
+    <div class="table-wrapper">
+      <table class="admin-table orders-table">
+        <thead>
           <tr>
-            <td>#{{ order.id }}</td>
-            <td>
-              <div>{{ order.customerName }}</div>
-              <div class="customer-email">{{ order.customerEmail }}</div>
-            </td>
-            <td>{{ order.orderDate | date: 'mediumDate' }}</td>
-            <td>{{ order.items.length }}</td>
-            <td>${{ order.totalAmount.toFixed(2) }}</td>
-            <td>
-              <span class="status-pill" [class]="statusClass(order.status)">{{ order.status }}</span>
-            </td>
-            <td>
-              <select
-                [ngModel]="order.status"
-                (ngModelChange)="updateStatus(order, $event)"
-                [disabled]="updatingOrderId() === order.id"
-              >
-                @for (status of statusOptions; track status) {
-                  <option [value]="status">{{ status }}</option>
-                }
-              </select>
-            </td>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th class="actions-col">Update Status</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (order of orders(); track order.id) {
+            <tr>
+              <td class="order-id">#{{ order.id }}</td>
+              <td>
+                <div class="customer-cell">
+                  <span>{{ order.customerName }}</span>
+                  <span class="customer-email">{{ order.customerEmail }}</span>
+                </div>
+              </td>
+              <td class="muted">{{ order.orderDate | date: 'mediumDate' }}</td>
+              <td>{{ order.items.length }}</td>
+              <td><strong>${{ order.totalAmount.toFixed(2) }}</strong></td>
+              <td>
+                <span class="status-pill" [class]="statusClass(order.status)">{{ order.status }}</span>
+              </td>
+              <td class="status-action-cell">
+                <select
+                  [ngModel]="order.status"
+                  (ngModelChange)="updateStatus(order, $event)"
+                  [disabled]="updatingOrderId() === order.id"
+                  class="status-select"
+                >
+                  @for (status of statusOptions; track status) {
+                    <option [value]="status">{{ status }}</option>
+                  }
+                </select>
+                @if (justUpdatedId() === order.id) {
+                  <span class="updated-check" title="Updated">✓</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
     <div class="pagination">
       <button (click)="goToPage(pageNumber - 1)" [disabled]="pageNumber === 1">Previous</button>

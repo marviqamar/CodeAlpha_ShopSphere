@@ -1,10 +1,25 @@
 <div class="admin-page">
-  <div class="admin-page-header">
-    <h1>Manage Products</h1>
-    <button (click)="openCreateForm()" class="primary-btn">+ Add Product</button>
+  <div class="page-header">
+    <div>
+      <p class="page-description">Manage your product catalog, pricing, and stock levels.</p>
+    </div>
+    <button (click)="openCreateForm()" class="btn-accent">+ Add Product</button>
   </div>
 
-  <!-- Create/Edit form -->
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.3-4.3"/>
+      </svg>
+      <input
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by product name..."
+      />
+    </div>
+  </div>
+
   @if (showForm()) {
     <div class="form-card">
       <h2>{{ editingProductId() === null ? 'Create Product' : 'Edit Product' }}</h2>
@@ -58,7 +73,7 @@
           <label>Product Images</label>
 
           @if (editingProductId() !== null) {
-            <p class="hint-text">Existing images shown below. Uploading new images here will not update this product — editing images isn't supported yet.</p>
+            <p class="hint-text">Existing images shown below. Uploading here will not update this product — editing images isn't supported yet.</p>
           }
 
           <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="isUploading()" />
@@ -71,7 +86,7 @@
             <div class="image-preview-row">
               @for (url of uploadedImageUrls(); track url) {
                 <div class="image-preview">
-                  <img [src]="imageBaseUrl + url" [alt]="'Product image'" />
+                  <img [src]="imageBaseUrl + url" alt="Product image" />
                   @if (editingProductId() === null) {
                     <button type="button" (click)="removeImage(url)" class="remove-image-btn">×</button>
                   }
@@ -80,7 +95,6 @@
             </div>
           }
         </div>
-        <!-- here -->
       </div>
 
       @if (formError()) {
@@ -88,49 +102,76 @@
       }
 
       <div class="form-actions">
-        <button (click)="saveProduct()" class="primary-btn">Save</button>
-        <button (click)="cancelForm()" class="secondary-btn">Cancel</button>
+        <button (click)="saveProduct()" class="btn-accent">Save</button>
+        <button (click)="cancelForm()" class="btn-secondary">Cancel</button>
       </div>
     </div>
   }
 
-  <!-- Product table -->
   @if (isLoading()) {
     <p class="status-text">Loading products...</p>
   }
 
-  @if (!isLoading()) {
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Category</th>
-          <th>Price</th>
-          <th>Stock</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (product of products(); track product.id) {
+  @if (!isLoading() && products().length === 0) {
+    <div class="empty-state">
+      <p>No products found.</p>
+    </div>
+  }
+
+  @if (!isLoading() && products().length > 0) {
+    <div class="table-wrapper">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <td>{{ product.name }}</td>
-            <td>{{ product.categoryName }}</td>
-            <td>${{ product.price.toFixed(2) }}</td>
-            <td>{{ product.stockQuantity }}</td>
-            <td>
-              <span class="status-pill" [class.active]="product.isActive" [class.inactive]="!product.isActive">
-                {{ product.isActive ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
-            <td class="actions-cell">
-              <button (click)="openEditForm(product)" class="link-btn">Edit</button>
-              <button (click)="deleteProduct(product.id)" class="link-btn danger">Delete</button>
-            </td>
+            <th>Product</th>
+            <th>Category</th>
+            <th>SKU</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th class="actions-col">Actions</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (product of products(); track product.id) {
+            <tr>
+              <td>
+                <div class="product-cell">
+                  <img
+                    [src]="product.imageUrls[0] ? imageBaseUrl + product.imageUrls[0] : 'https://placehold.co/40x40?text=—'"
+                    alt=""
+                  />
+                  <span>{{ product.name }}</span>
+                </div>
+              </td>
+              <td>{{ product.categoryName }}</td>
+              <td class="muted">{{ product.sku }}</td>
+              <td>${{ product.price.toFixed(2) }}</td>
+              <td>{{ product.stockQuantity }}</td>
+              <td>
+                <span class="status-pill" [class.active]="product.isActive" [class.inactive]="!product.isActive">
+                  {{ product.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button (click)="openEditForm(product)" class="icon-btn" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 20h9"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+                <button (click)="deleteProduct(product)" class="icon-btn danger" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 6h18"/>
+                    <path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
     <div class="pagination">
       <button (click)="goToPage(pageNumber - 1)" [disabled]="pageNumber === 1">Previous</button>
@@ -139,3 +180,5 @@
     </div>
   }
 </div>
+
+<app-confirm-dialog></app-confirm-dialog>

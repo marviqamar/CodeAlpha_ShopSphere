@@ -1,51 +1,90 @@
 <div class="page-container">
 
-  <h1>Our Products</h1>
-
   <!-- Filter bar -->
-  <div class="filter-bar">
-    <input
-      type="text"
-      placeholder="Search products..."
-      [(ngModel)]="search"
-      (ngModelChange)="onFilterChange()"
-      class="search-input"
-    />
+  <div class="filter-card">
+    <div class="filter-bar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.3-4.3"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search products..."
+          [(ngModel)]="search"
+          (ngModelChange)="onFilterChange()"
+        />
+      </div>
 
-    <select [(ngModel)]="selectedCategoryId" (ngModelChange)="onFilterChange()">
-      <option [ngValue]="null">All Categories</option>
-      @for (category of categories(); track category.id) {
-        <option [ngValue]="category.id">{{ category.name }}</option>
-      }
-    </select>
+      <select [(ngModel)]="selectedCategoryId" (ngModelChange)="onCategoryDropdownChange()">
+        <option [ngValue]="null">All Categories</option>
+        @for (category of categories(); track category.id) {
+          <option [ngValue]="category.id">{{ category.name }}</option>
+        }
+      </select>
 
-    <input
-      type="number"
-      placeholder="Min price"
-      [(ngModel)]="minPrice"
-      (ngModelChange)="onFilterChange()"
-      class="price-input"
-    />
+      <input
+        type="number"
+        placeholder="Min price"
+        [(ngModel)]="minPrice"
+        (ngModelChange)="onFilterChange()"
+        class="price-input"
+      />
 
-    <input
-      type="number"
-      placeholder="Max price"
-      [(ngModel)]="maxPrice"
-      (ngModelChange)="onFilterChange()"
-      class="price-input"
-    />
+      <input
+        type="number"
+        placeholder="Max price"
+        [(ngModel)]="maxPrice"
+        (ngModelChange)="onFilterChange()"
+        class="price-input"
+      />
 
-    <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
-      <option value="CreatedAt">Newest</option>
-      <option value="Price">Price</option>
-      <option value="Name">Name</option>
-    </select>
+      <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
+        <option value="CreatedAt">Newest</option>
+        <option value="Price">Price</option>
+        <option value="Name">Name</option>
+      </select>
 
-    <select [(ngModel)]="sortDescending" (ngModelChange)="onFilterChange()">
-      <option [ngValue]="true">Descending</option>
-      <option [ngValue]="false">Ascending</option>
-    </select>
+      <select [(ngModel)]="sortDescending" (ngModelChange)="onFilterChange()">
+        <option [ngValue]="true">Descending</option>
+        <option [ngValue]="false">Ascending</option>
+      </select>
+    </div>
   </div>
+
+  <!-- Shop by category: only on the unfiltered, unsearched view -->
+  @if (selectedCategoryId === null && !search && categories().length > 0) {
+    <div class="category-tiles-wrapper">
+      @if (canScrollLeft()) {
+        <button class="scroll-arrow left" (click)="scrollCategoryTiles('left')" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+      }
+
+      <div class="category-tiles" (scroll)="checkScrollPosition()" #categoryTiles>
+        @for (category of categories(); track category.id) {
+          <button class="category-tile" (click)="selectCategory(category.id)">
+            <img
+              [src]="category.imageUrl ? imageBaseUrl + category.imageUrl : 'https://placehold.co/400x400?text=No+Image'"
+              [alt]="category.name"
+              (error)="onImageError($event)"
+            />
+            <span class="tile-label">{{ category.name }}</span>
+          </button>
+        }
+      </div>
+
+      @if (canScrollRight()) {
+        <button class="scroll-arrow right" (click)="scrollCategoryTiles('right')" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      }
+    </div>
+  }
 
   <!-- Loading state -->
   @if (isLoading()) {
@@ -54,7 +93,10 @@
 
   <!-- Empty state -->
   @if (!isLoading() && products().length === 0) {
-    <p class="status-text">No products found. Try adjusting your filters.</p>
+    <div class="empty-state">
+      <p>No products found. Try adjusting your filters.</p>
+      <button (click)="resetFilters()" class="btn-secondary">Reset Filters</button>
+    </div>
   }
 
   <!-- Product grid -->
@@ -75,7 +117,10 @@
             <p class="price">${{ product.price.toFixed(2) }}</p>
 
             @if (product.reviewCount > 0) {
-              <p class="rating">⭐ {{ product.averageRating }} ({{ product.reviewCount }})</p>
+              <p class="rating">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21l1.2-6.9-5-4.9 6.9-1z"/></svg>
+                {{ product.averageRating }} ({{ product.reviewCount }})
+              </p>
             } @else {
               <p class="rating no-reviews">No reviews yet</p>
             }

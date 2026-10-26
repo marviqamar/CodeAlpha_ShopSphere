@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { ProductService } from '../../../../core/services/product';
 import { CategoryService } from '../../../../core/services/category';
 import { UploadService } from '../../../../core/services/upload';
@@ -10,7 +11,7 @@ import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-product-list',
-  imports: [FormsModule],
+  imports: [FormsModule, ConfirmDialog],
   templateUrl: './admin-product-list.html',
   styleUrl: './admin-product-list.css'
 })
@@ -19,21 +20,21 @@ export class AdminProductList implements OnInit {
   private categoryService = inject(CategoryService);
   private uploadService = inject(UploadService);
 
+  @ViewChild(ConfirmDialog) confirmDialog!: ConfirmDialog;
+
   products = signal<Product[]>([]);
   categories = signal<Category[]>([]);
   isLoading = signal(true);
   totalPages = signal(0);
   pageNumber = 1;
+  searchTerm = '';
 
   showForm = signal(false);
   editingProductId = signal<number | null>(null);
   formError = signal('');
 
-  // Holds already-uploaded image URLs (relative, like "/uploads/abc.jpg")
   uploadedImageUrls = signal<string[]>([]);
   isUploading = signal(false);
-
-  // Base URL for displaying images (without the trailing /api)
   imageBaseUrl = environment.apiUrl.replace('/api', '');
 
   formData = {
@@ -59,7 +60,13 @@ export class AdminProductList implements OnInit {
 
   loadProducts(): void {
     this.isLoading.set(true);
-    this.productService.getAll({ pageNumber: this.pageNumber, pageSize: 10, sortBy: 'CreatedAt', sortDescending: true }).subscribe({
+    this.productService.getAll({
+      pageNumber: this.pageNumber,
+      pageSize: 10,
+      sortBy: 'CreatedAt',
+      sortDescending: true,
+      search: this.searchTerm || undefined
+    }).subscribe({
       next: (result) => {
         this.products.set(result.items);
         this.totalPages.set(result.totalPages);
@@ -67,6 +74,11 @@ export class AdminProductList implements OnInit {
       },
       error: () => this.isLoading.set(false)
     });
+  }
+
+  onSearchChange(): void {
+    this.pageNumber = 1;
+    this.loadProducts();
   }
 
   goToPage(page: number): void {
@@ -118,7 +130,7 @@ export class AdminProductList implements OnInit {
       next: (result) => {
         this.uploadedImageUrls.update(current => [...current, result.url]);
         this.isUploading.set(false);
-        input.value = ''; // reset the file input so the same file can be re-selected if needed
+        input.value = '';
       },
       error: (err) => {
         this.formError.set(err.error?.message || 'Image upload failed.');
@@ -179,12 +191,17 @@ export class AdminProductList implements OnInit {
     }
   }
 
-  deleteProduct(id: number): void {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-
-    this.productService.delete(id).subscribe({
-      next: () => this.loadProducts(),
-      error: (err) => alert(err.error?.message || 'Could not delete product.')
+  deleteProduct(product: Product): void {
+    this.confirmDialog.open({
+      title: 'Delete Product',
+      message: `Are you sure you want to delete "${product.name}"? This cannot be undone.`,
+      confirmLabel: 'Delete',
+      onConfirm: () => {
+        this.productService.delete(product.id).subscribe({
+          next: () => this.loadProducts(),
+          error: (err) => alert(err.error?.message || 'Could not delete product.')
+        });
+      }
     });
   }
 }

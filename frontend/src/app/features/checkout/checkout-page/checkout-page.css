@@ -1,26 +1,31 @@
 .page-container {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+h1 {
+  margin-bottom: var(--space-lg);
+  font-size: 26px;
 }
 
 .status-text {
   text-align: center;
-  color: #666;
-  padding: 40px;
+  color: var(--color-text-secondary);
+  padding: var(--space-2xl) 0;
 }
 
 .checkout-layout {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
-  gap: 32px;
+  gap: var(--space-xl);
   align-items: start;
 }
 
 .shipping-section h2,
 .order-summary h2 {
-  margin: 0 0 16px;
-  font-size: 18px;
+  margin: 0 0 var(--space-md);
+  font-size: 17px;
 }
 
 .form-group {
@@ -44,21 +49,26 @@ label {
 input {
   width: 100%;
   padding: 9px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   box-sizing: border-box;
 }
 
+input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
 .field-error {
-  color: #dc2626;
+  color: var(--color-danger);
   font-size: 12px;
 }
 
 .coupon-section {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
 }
 
 .coupon-section h3 {
@@ -73,12 +83,14 @@ input {
 
 .coupon-input-row button {
   padding: 9px 16px;
-  background: #1a1a2e;
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .coupon-input-row button:disabled {
@@ -90,11 +102,13 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #dcfce7;
+  background: var(--color-success-bg);
   color: #166534;
   padding: 10px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .remove-coupon-btn {
@@ -107,11 +121,12 @@ input {
 }
 
 .order-summary {
-  background: #f9fafb;
-  padding: 24px;
-  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
   position: sticky;
-  top: 20px;
+  top: 80px;
 }
 
 .summary-item {
@@ -128,17 +143,17 @@ input {
   font-size: 14px;
   margin: 10px 0;
   padding-top: 10px;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--color-border);
 }
 
 .summary-row.discount {
-  color: #16a34a;
+  color: var(--color-success);
 }
 
 .summary-row.total {
   font-size: 18px;
   font-weight: 700;
-  border-top: 2px solid #ddd;
+  border-top: 2px solid var(--color-border);
   padding-top: 14px;
   margin-top: 14px;
 }
@@ -146,17 +161,44 @@ input {
 .place-order-btn {
   width: 100%;
   padding: 14px;
-  background: #4f46e5;
-  color: white;
+  background: var(--color-accent);
+  color: var(--color-primary);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 16px;
+  margin-top: var(--space-md);
 }
 
 .place-order-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .page-container {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .order-summary {
+    position: static;
+  }
+
+  .coupon-input-row {
+    flex-direction: column;
+  }
+
+  .coupon-input-row button {
+    width: 100%;
+  }
 }

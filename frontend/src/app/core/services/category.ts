@@ -16,11 +16,11 @@ export class CategoryService {
     return this.http.get<Category[]>(this.apiUrl);
   }
 
-  create(category: { name: string; description?: string }): Observable<Category> {
+  create(category: { name: string; description?: string; imageUrl?: string }): Observable<Category> {
     return this.http.post<Category>(this.apiUrl, category);
   }
 
-  update(id: number, category: { name: string; description?: string }): Observable<Category> {
+  update(id: number, category: { name: string; description?: string; imageUrl?: string }): Observable<Category> {
     return this.http.put<Category>(`${this.apiUrl}/${id}`, category);
   }
 

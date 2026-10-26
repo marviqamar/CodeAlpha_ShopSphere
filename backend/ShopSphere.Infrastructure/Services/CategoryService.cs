@@ -23,7 +23,8 @@ namespace ShopSphere.Infrastructure.Services
                 {
                     Id = c.Id,
                     Name = c.Name,
-                    Description = c.Description
+                    Description = c.Description,
+                    ImageUrl = c.ImageUrl
                 })
                 .ToListAsync();
         }
@@ -37,7 +38,8 @@ namespace ShopSphere.Infrastructure.Services
             {
                 Id = category.Id,
                 Name = category.Name,
-                Description = category.Description
+                Description = category.Description,
+                ImageUrl = category.ImageUrl
             };
         }
 
@@ -46,7 +48,8 @@ namespace ShopSphere.Infrastructure.Services
             var category = new Category
             {
                 Name = request.Name,
-                Description = request.Description
+                Description = request.Description,
+                ImageUrl = request.ImageUrl
             };
 
             _context.Categories.Add(category);
@@ -56,7 +59,8 @@ namespace ShopSphere.Infrastructure.Services
             {
                 Id = category.Id,
                 Name = category.Name,
-                Description = category.Description
+                Description = category.Description,
+                ImageUrl = category.ImageUrl
             };
         }
 
@@ -67,6 +71,7 @@ namespace ShopSphere.Infrastructure.Services
 
             category.Name = request.Name;
             category.Description = request.Description;
+            category.ImageUrl = request.ImageUrl;
 
             await _context.SaveChangesAsync();
 
@@ -74,7 +79,8 @@ namespace ShopSphere.Infrastructure.Services
             {
                 Id = category.Id,
                 Name = category.Name,
-                Description = category.Description
+                Description = category.Description,
+                ImageUrl = category.ImageUrl
             };
         }
 

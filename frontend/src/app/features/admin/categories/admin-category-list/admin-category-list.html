@@ -1,7 +1,23 @@
 <div class="admin-page">
-  <div class="admin-page-header">
-    <h1>Manage Categories</h1>
-    <button (click)="openCreateForm()" class="primary-btn">+ Add Category</button>
+  <div class="page-header">
+    <div>
+      <p class="page-description">Organize your products into categories.</p>
+    </div>
+    <button (click)="openCreateForm()" class="btn-accent">+ Add Category</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.3-4.3"/>
+      </svg>
+      <input
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilter()"
+        placeholder="Search categories..."
+      />
+    </div>
   </div>
 
   @if (showForm()) {
@@ -17,14 +33,29 @@
         <label>Description (optional)</label>
         <textarea [(ngModel)]="formData.description" rows="2"></textarea>
       </div>
-
+      <!-- here -->
+      <div class="form-group">
+        <label>Category Image</label>
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="isUploading()" />
+        @if (isUploading()) {
+          <p class="hint-text">Uploading...</p>
+        }
+        @if (uploadedImageUrl()) {
+          <div class="image-preview-row">
+            <div class="image-preview">
+              <img [src]="imageBaseUrl + uploadedImageUrl()" alt="Category" />
+            </div>
+          </div>
+        }
+      </div>
+       <!-- here -->
       @if (formError()) {
         <p class="form-error">{{ formError() }}</p>
       }
 
       <div class="form-actions">
-        <button (click)="saveCategory()" class="primary-btn">Save</button>
-        <button (click)="cancelForm()" class="secondary-btn">Cancel</button>
+        <button (click)="saveCategory()" class="btn-accent">Save</button>
+        <button (click)="cancelForm()" class="btn-secondary">Cancel</button>
       </div>
     </div>
   }
@@ -33,27 +64,55 @@
     <p class="status-text">Loading categories...</p>
   }
 
-  @if (!isLoading()) {
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (category of categories(); track category.id) {
+  @if (!isLoading() && categories().length === 0) {
+    <div class="empty-state">
+      <p>No categories found.</p>
+    </div>
+  }
+
+  @if (!isLoading() && categories().length > 0) {
+    <div class="table-wrapper">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <td>{{ category.name }}</td>
-            <td>{{ category.description || '—' }}</td>
-            <td class="actions-cell">
-              <button (click)="openEditForm(category)" class="link-btn">Edit</button>
-              <button (click)="deleteCategory(category.id)" class="link-btn danger">Delete</button>
-            </td>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th class="actions-col">Actions</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (category of categories(); track category.id) {
+            <tr>
+              <td>
+                <img
+                  [src]="category.imageUrl ? imageBaseUrl + category.imageUrl : 'https://placehold.co/40x40?text=—'"
+                  alt=""
+                  class="category-thumb"
+                />
+              </td>
+              <td><strong>{{ category.name }}</strong></td>
+              <td class="muted">{{ category.description || '—' }}</td>
+              <td class="actions-cell">
+                <button (click)="openEditForm(category)" class="icon-btn" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 20h9"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+                <button (click)="deleteCategory(category)" class="icon-btn danger" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 6h18"/>
+                    <path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </div>
+
+<app-confirm-dialog></app-confirm-dialog>

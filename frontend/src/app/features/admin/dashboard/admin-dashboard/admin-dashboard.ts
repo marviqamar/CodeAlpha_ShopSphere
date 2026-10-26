@@ -1,5 +1,4 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { DashboardService } from '../../../../core/services/dashboard';
 import { DashboardStats } from '../../../../core/models/dashboard.model';
 import { DatePipe } from '@angular/common';
@@ -7,7 +6,7 @@ import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [RouterLink, DatePipe],
+  imports: [DatePipe],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css'
 })

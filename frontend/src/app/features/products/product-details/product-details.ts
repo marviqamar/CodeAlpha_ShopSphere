@@ -33,7 +33,6 @@ export class ProductDetails implements OnInit {
   addToCartMessage = signal('');
 
   newReviewRating = 5;
-  newReviewComment = '';
   reviewError = signal('');
   reviewSuccess = signal('');
 
@@ -81,26 +80,29 @@ export class ProductDetails implements OnInit {
     });
   }
 
-  submitReview(): void {
+  selectedRating = signal(0);
+
+  rateProduct(star: number): void {
     const product = this.product();
     if (!product) return;
+
+    // Fill the star immediately, regardless of outcome
+    this.selectedRating.set(star);
 
     this.reviewError.set('');
     this.reviewSuccess.set('');
 
     this.reviewService.create({
       productId: product.id,
-      rating: this.newReviewRating,
-      comment: this.newReviewComment || undefined
+      rating: star
     }).subscribe({
       next: () => {
-        this.reviewSuccess.set('Review submitted!');
-        this.newReviewComment = '';
-        this.newReviewRating = 5;
-        this.loadReviews(product.id); // refresh the list
+        this.reviewSuccess.set('Thanks for rating this product!');
+        this.loadReviews(product.id);
       },
       error: (err) => {
-        this.reviewError.set(err.error?.message || 'Could not submit review.');
+        this.reviewError.set(err.error?.message || 'Could not submit rating.');
+        // star stays filled on screen even though it wasn't actually saved
       }
     });
   }
@@ -121,20 +123,26 @@ export class ProductDetails implements OnInit {
     }
   }
 
-  //Hover Ratings
-  hoverRating = signal(0);
+  //Ratings
+  activeTab = signal<'description' | 'reviews'>('description');
 
-  setRating(value: number): void {
-    this.newReviewRating = value;
-  }
-
-  setHoverRating(value: number): void {
-    this.hoverRating.set(value);
-  }
-
-  clearHoverRating(): void {
-    this.hoverRating.set(0);
+  setTab(tab: 'description' | 'reviews'): void {
+    this.activeTab.set(tab);
   }
 
   imageBaseUrl = environment.apiUrl.replace('/api', '');
+
+  increaseQuantity(): void {
+    const product = this.product();
+    if (!product) return;
+    if (this.quantity < product.stockQuantity) {
+      this.quantity++;
+    }
+  }
+
+  decreaseQuantity(): void {
+    if (this.quantity > 1) {
+      this.quantity--;
+    }
+  }
 }

@@ -1,5 +1,10 @@
 <div class="page-container">
-  <h1>My Orders</h1>
+  <div class="page-header">
+    <h1>My Orders</h1>
+    @if (!isLoading() && orders().length > 0) {
+      <span class="order-count">{{ orders().length }} order{{ orders().length === 1 ? '' : 's' }}</span>
+    }
+  </div>
 
   @if (isLoading()) {
     <p class="status-text">Loading orders...</p>
@@ -7,8 +12,13 @@
 
   @if (!isLoading() && orders().length === 0) {
     <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+        <rect x="5" y="3" width="14" height="18" rx="2"/>
+        <path d="M9 3v2a1 1 0 001 1h4a1 1 0 001-1V3"/>
+        <path d="M8 11h8M8 15h5"/>
+      </svg>
       <p>You haven't placed any orders yet.</p>
-      <a routerLink="/">Start Shopping</a>
+      <a routerLink="/" class="btn-accent">Start Shopping</a>
     </div>
   }
 
@@ -16,17 +26,26 @@
     <div class="order-list">
       @for (order of orders(); track order.id) {
         <a [routerLink]="['/orders', order.id]" class="order-card">
-          <div class="order-card-header">
-            <div>
-              <strong>Order #{{ order.id }}</strong>
-              <span class="order-date">{{ order.orderDate | date: 'mediumDate' }}</span>
+          <div class="order-card-left">
+            <div class="order-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="5" y="3" width="14" height="18" rx="2"/>
+                <path d="M9 3v2a1 1 0 001 1h4a1 1 0 001-1V3"/>
+                <path d="M8 11h8M8 15h5"/>
+              </svg>
             </div>
-            <span class="status-badge" [class]="statusClass(order.status)">{{ order.status }}</span>
+            <div>
+              <p class="order-number">Order #{{ order.id }}</p>
+              <p class="order-date">{{ order.orderDate | date: 'mediumDate' }} · {{ order.items.length }} item{{ order.items.length === 1 ? '' : 's' }}</p>
+            </div>
           </div>
 
-          <div class="order-card-body">
-            <span>{{ order.items.length }} item(s)</span>
+          <div class="order-card-right">
+            <span class="status-badge" [class]="statusClass(order.status)">{{ order.status }}</span>
             <span class="order-total">${{ order.totalAmount.toFixed(2) }}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
           </div>
         </a>
       }

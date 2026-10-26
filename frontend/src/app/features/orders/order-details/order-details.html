@@ -11,29 +11,40 @@
   @if (!isLoading() && order(); as o) {
 
     @if (justPlaced()) {
-      <div class="success-banner">✓ Your order was placed successfully!</div>
+      <div class="success-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        Your order was placed successfully!
+      </div>
     }
+
+    <a routerLink="/orders" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to My Orders
+    </a>
 
     <div class="order-header">
       <div>
         <h1>Order #{{ o.id }}</h1>
         <p class="order-date">Placed on {{ o.orderDate | date: 'medium' }}</p>
       </div>
-      <span class="status-badge" [class]="statusClass(o.status)">{{ o.status }}</span>
-      @if (o.status === 'Pending') {
-        <button (click)="cancelOrder()" [disabled]="isCancelling()" class="cancel-btn">
-          {{ isCancelling() ? 'Cancelling...' : 'Cancel Order' }}
-        </button>
-      }
-      @if (cancelError()) {
-        <p class="field-error">{{ cancelError() }}</p>
-      }
+      <div class="header-right">
+        <span class="status-badge" [class]="statusClass(o.status)">{{ o.status }}</span>
+        @if (o.status === 'Pending') {
+          <button (click)="cancelOrder()" [disabled]="isCancelling()" class="cancel-btn">
+            {{ isCancelling() ? 'Cancelling...' : 'Cancel Order' }}
+          </button>
+        }
+      </div>
     </div>
+
+    @if (cancelError()) {
+      <p class="field-error">{{ cancelError() }}</p>
+    }
 
     <div class="details-layout">
 
       <div class="items-section">
-        <h2>Items</h2>
+        <h2>Items ({{ o.items.length }})</h2>
         @for (item of o.items; track item.productId) {
           <div class="order-item">
             <img
@@ -70,17 +81,20 @@
         </div>
 
         <div class="shipping-box">
-          <h2>Shipping Address</h2>
-          <p>{{ o.shippingFullName }}</p>
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="shipping-icon"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Shipping Address
+          </h2>
+          <p class="shipping-name">{{ o.shippingFullName }}</p>
           <p>{{ o.shippingStreet }}</p>
           <p>{{ o.shippingCity }}, {{ o.shippingState }} {{ o.shippingPostalCode }}</p>
           <p>{{ o.shippingCountry }}</p>
-          <p>{{ o.shippingPhone }}</p>
+          <p class="shipping-phone">{{ o.shippingPhone }}</p>
         </div>
       </div>
 
     </div>
-
-    <a routerLink="/orders" class="back-link">← Back to My Orders</a>
   }
 </div>
+
+<app-confirm-dialog></app-confirm-dialog>

@@ -43,7 +43,7 @@
               >
                 Add to Cart
               </button>
-              <button (click)="remove(item.id)" class="remove-btn">Remove</button>
+              <button (click)="remove(item.id, item.productName)" class="remove-btn">Remove</button>
             </div>
           </div>
         </div>
@@ -51,3 +51,4 @@
     </div>
   }
 </div>
+<app-confirm-dialog></app-confirm-dialog>
